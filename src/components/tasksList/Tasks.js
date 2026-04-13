@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import {
   Flex,
   Stack,
@@ -16,107 +16,51 @@ import {
   Checkbox,
   Badge,
 } from '@chakra-ui/react';
-import { DeleteIcon, InfoIcon } from '@chakra-ui/icons';
+import { DeleteIcon } from '@chakra-ui/icons';
+
 export default function Tasks() {
-  const inputRef = useRef('');
-  const checkRef = useRef(false);
-  const [id, setId] = useState(0);
+  const inputRef = useRef(null);
+  const [nextId, setNextId] = useState(0);
   const [toDoList, setToDoList] = useState([]);
   const [finishedList, setFinishedList] = useState([]);
   const [deletedList, setDeletedList] = useState([]);
-  const [listCount, setListCount] = useState(0);
-  const [finishedCount, setFinishedCount] = useState(0);
-  const [deletedCount, setDeletedCount] = useState(0);
-  const [moreTasks, setMoreTasks] = useState(4);
-  const [tasksVisibility, setTaskVisibility] = useState('hidden');
-  const [moreFinished, setMoreFinished] = useState(4);
-  const [finishedVisibility, setFinishedVisibility] = useState('hidden');
-  const [moreDeleted, setMoreDeleted] = useState(4);
-  const [deletedVisibility, setDeletedVisibility] = useState('hidden');
-  const [showedTasks, setSowedTasks] = useState(8);
-  const [showedFinishedTasks, setSowedFinishedTasks] = useState(8);
-  const [showedDeletedTasks, setSowedDeletedTasks] = useState(8);
+  const [visibleTasks, setVisibleTasks] = useState(4);
+  const [visibleFinished, setVisibleFinished] = useState(4);
+  const [visibleDeleted, setVisibleDeleted] = useState(4);
 
-  const handleClick = () => {
-    if (inputRef.current.value) {
-      setId(id + 1);
-      setListCount(listCount + 1);
-      setToDoList([
-        ...toDoList,
-        {
-          id: id,
-          task: inputRef.current.value,
-        },
-      ]);
-      inputRef.current.value = '';
-      listCount < 4 ? setTaskVisibility('hidden') : setTaskVisibility('true');
-    } else {
+  const handleAddTask = useCallback(() => {
+    const value = inputRef.current?.value?.trim();
+    if (!value) {
       alert('Please write a task before');
+      return;
     }
-  };
-  const handCheckBoxClick = () => {
-    const checkedId = checkRef.current.id;
-    const copiedTask = toDoList.slice(checkedId, checkedId + 1);
-    setListCount(listCount - 1);
-    setFinishedCount(finishedCount + 1);
+    setToDoList(prev => [...prev, { id: nextId, task: value }]);
+    setNextId(prev => prev + 1);
+    inputRef.current.value = '';
+  }, [nextId]);
 
-    setFinishedList([
-      ...finishedList,
-      { id: copiedTask[0].id, task: copiedTask[0].task },
-    ]);
-    toDoList.splice(checkedId, 1);
-    console.log(listCount);
-    listCount < 6 ? setTaskVisibility('hidden') : setTaskVisibility('true');
-    finishedCount < 4
-      ? setFinishedVisibility('hidden')
-      : setFinishedVisibility('true');
-  };
-  const handleDeletedtasks = () => {
-    const checkedId = checkRef.current.id;
-    const copiedTask = toDoList.slice(checkedId, checkedId + 1);
-    setListCount(listCount - 1);
-    setDeletedCount(deletedCount + 1);
-    setDeletedList([
-      ...deletedList,
-      { id: copiedTask[0].id, task: copiedTask[0].task },
-    ]);
-    toDoList.splice(checkedId, 1);
-    console.log(listCount);
-    listCount < 6 ? setTaskVisibility('hidden') : setTaskVisibility('true');
-    deletedCount < 4
-      ? setDeletedVisibility('hidden')
-      : setDeletedVisibility('true');
-  };
-  const handleMoretasks = () => {
-    setMoreTasks(moreTasks + 4);
-    setSowedTasks(showedTasks + 4);
-    console.log(listCount);
-    console.log(showedTasks);
-    showedTasks >= listCount
-      ? setTaskVisibility('hidden')
-      : setTaskVisibility('true');
-  };
-  const handleMoreFinished = () => {
-    setMoreFinished(moreFinished + 4);
-    setSowedFinishedTasks(showedFinishedTasks + 4);
-    showedFinishedTasks >= finishedCount
-      ? setFinishedVisibility('hidden')
-      : setFinishedVisibility('true');
-  };
-  const handleMoreDeleted = () => {
-    setMoreDeleted(moreDeleted + 4);
-    setSowedDeletedTasks(showedDeletedTasks + 4);
-    showedDeletedTasks >= deletedCount
-      ? setDeletedVisibility('hidden')
-      : setDeletedVisibility('true');
-  };
+  const handleCompleteTask = useCallback(index => {
+    setFinishedList(prev => [...prev, toDoList[index]]);
+    setToDoList(prev => prev.filter((_, i) => i !== index));
+  }, [toDoList]);
+
+  const handleDeleteTask = useCallback(index => {
+    setDeletedList(prev => [...prev, toDoList[index]]);
+    setToDoList(prev => prev.filter((_, i) => i !== index));
+  }, [toDoList]);
+
+  const bgCard = useColorModeValue('white', 'gray.700');
+  const textColor = useColorModeValue('gray.800', 'gray.200');
+  const inputBg = useColorModeValue('gray.100', 'gray.600');
+  const inputFocusBg = useColorModeValue('gray.200', 'gray.800');
+  const columnTextColor = useColorModeValue('gray.600', 'gray.800');
 
   return (
     <>
       <Flex>
         <Stack
           boxShadow={'2xl'}
-          bg={useColorModeValue('white', 'gray.700')}
+          bg={bgCard}
           rounded={'xl'}
           p={10}
           spacing={8}
@@ -126,14 +70,11 @@ export default function Tasks() {
             <Heading
               textTransform={'uppercase'}
               fontSize={'3xl'}
-              color={useColorModeValue('gray.800', 'gray.200')}
+              color={textColor}
             >
               To Do List
             </Heading>
-            <Text
-              fontSize={'lg'}
-              color={useColorModeValue('gray.800', 'gray.200')}
-            >
+            <Text fontSize={'lg'} color={textColor}>
               Enter a task and click save !
             </Text>
           </Stack>
@@ -145,14 +86,11 @@ export default function Tasks() {
             <Input
               type={'text'}
               placeholder={'write your task here'}
-              color={useColorModeValue('gray.800', 'gray.200')}
-              bg={useColorModeValue('gray.100', 'gray.600')}
+              color={textColor}
+              bg={inputBg}
               rounded={'full'}
               border={0}
-              _focus={{
-                bg: useColorModeValue('gray.200', 'gray.800'),
-                outline: 'none',
-              }}
+              _focus={{ bg: inputFocusBg, outline: 'none' }}
               ref={inputRef}
             />
             <Button
@@ -162,7 +100,7 @@ export default function Tasks() {
               flex={'1 0 auto'}
               _hover={{ bg: 'blue.500' }}
               _focus={{ bg: 'blue.500' }}
-              onClick={handleClick}
+              onClick={handleAddTask}
             >
               Save me
             </Button>
@@ -175,124 +113,120 @@ export default function Tasks() {
             <Text
               textTransform={'uppercase'}
               fontSize={'2xl'}
-              color={useColorModeValue('gray.600', 'gray.800')}
+              color={columnTextColor}
             >
               New Tasks
               <Badge ml="1" mb={'1'} colorScheme="yellow.200" fontSize="1em">
-                {listCount}
+                {toDoList.length}
               </Badge>
             </Text>
-
             <TableContainer>
               <Table variant="striped" fontSize={'sm'} w={'auto'}>
                 <Tbody>
-                  {toDoList.slice(0, moreTasks).map(item => {
-                    return (
-                      <Tr key={item.id}>
-                        <Td w={'90%'}>{item.task}</Td>
-                        <Td w={'5%'}>
-                          <Checkbox
-                            pr={4}
-                            mt={1}
-                            colorScheme="green"
-                            isInvalid
-                            ref={checkRef}
-                            onChange={handCheckBoxClick}
-                            id={toDoList.indexOf(item)}
-                          ></Checkbox>
-                          <DeleteIcon
-                            boxSize={4}
-                            color="red.500"
-                            cursor={'pointer'}
-                            onClick={handleDeletedtasks}
-                          ></DeleteIcon>
-                        </Td>
-                      </Tr>
-                    );
-                  })}
+                  {toDoList.slice(0, visibleTasks).map((item, index) => (
+                    <Tr key={item.id}>
+                      <Td w={'90%'}>{item.task}</Td>
+                      <Td w={'5%'}>
+                        <Checkbox
+                          pr={4}
+                          mt={1}
+                          colorScheme="green"
+                          isInvalid
+                          onChange={() => handleCompleteTask(index)}
+                        />
+                        <DeleteIcon
+                          boxSize={4}
+                          color="red.500"
+                          cursor={'pointer'}
+                          onClick={() => handleDeleteTask(index)}
+                        />
+                      </Td>
+                    </Tr>
+                  ))}
                 </Tbody>
               </Table>
             </TableContainer>
-            <Button
-              colorScheme="blue"
-              size={'sm'}
-              ml={'250px'}
-              visibility={tasksVisibility}
-              variant="link"
-              onClick={handleMoretasks}
-            >
-              Show More
-            </Button>
+            {toDoList.length > visibleTasks && (
+              <Button
+                colorScheme="blue"
+                size={'sm'}
+                ml={'250px'}
+                variant="link"
+                onClick={() => setVisibleTasks(v => v + 4)}
+              >
+                Show More
+              </Button>
+            )}
           </Box>
+
           <Box w="350px" h="auto" bg="green.200">
             <Text
               textTransform={'uppercase'}
               fontSize={'2xl'}
-              color={useColorModeValue('gray.600', 'gray.800')}
+              color={columnTextColor}
             >
-              finished Tasks
+              Finished Tasks
               <Badge ml="1" mb={'1'} colorScheme="yellow.200" fontSize="1em">
-                {finishedCount}
-              </Badge>
-            </Text>
-            <TableContainer>
-              <Table variant="striped" fontSize={'sm'}>
-                <Tbody boxSize={'fit-content'}>
-                  {finishedList.slice(0, moreFinished).map(item => {
-                    return (
-                      <Tr key={item.id}>
-                        <Td w={'100%'}>{item.task}</Td>
-                      </Tr>
-                    );
-                  })}
-                </Tbody>
-              </Table>
-            </TableContainer>
-            <Button
-              colorScheme="blue"
-              size={'sm'}
-              ml={'250px'}
-              visibility={finishedVisibility}
-              variant="link"
-              onClick={handleMoreFinished}
-            >
-              Show More
-            </Button>
-          </Box>
-          <Box w="350px" h="auto" bg="red.200">
-            <Text
-              textTransform={'uppercase'}
-              fontSize={'2xl'}
-              color={useColorModeValue('gray.600', 'gray.800')}
-            >
-              Deleted Tasks
-              <Badge ml="1" mb={'1'} colorScheme="yellow.200" fontSize="1em">
-                {deletedCount}
+                {finishedList.length}
               </Badge>
             </Text>
             <TableContainer>
               <Table variant="striped" fontSize={'sm'}>
                 <Tbody>
-                  {deletedList.slice(0, moreDeleted).map(item => {
-                    return (
-                      <Tr key={item.id}>
-                        <Td w={'100%'}>{item.task}</Td>
-                      </Tr>
-                    );
-                  })}
+                  {finishedList.slice(0, visibleFinished).map(item => (
+                    <Tr key={item.id}>
+                      <Td w={'100%'}>{item.task}</Td>
+                    </Tr>
+                  ))}
                 </Tbody>
               </Table>
             </TableContainer>
-            <Button
-              colorScheme="blue"
-              size={'sm'}
-              ml={'250px'}
-              visibility={deletedVisibility}
-              variant="link"
-              onClick={handleMoreDeleted}
+            {finishedList.length > visibleFinished && (
+              <Button
+                colorScheme="blue"
+                size={'sm'}
+                ml={'250px'}
+                variant="link"
+                onClick={() => setVisibleFinished(v => v + 4)}
+              >
+                Show More
+              </Button>
+            )}
+          </Box>
+
+          <Box w="350px" h="auto" bg="red.200">
+            <Text
+              textTransform={'uppercase'}
+              fontSize={'2xl'}
+              color={columnTextColor}
             >
-              Show More
-            </Button>
+              Deleted Tasks
+              <Badge ml="1" mb={'1'} colorScheme="yellow.200" fontSize="1em">
+                {deletedList.length}
+              </Badge>
+            </Text>
+            <TableContainer>
+              <Table variant="striped" fontSize={'sm'}>
+                <Tbody>
+                  {deletedList.slice(0, visibleDeleted).map(item => (
+                    <Tr key={item.id}>
+                      <Td w={'100%'}>{item.task}</Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+            {deletedList.length > visibleDeleted && (
+              <Button
+                colorScheme="blue"
+                size={'sm'}
+                ml={'250px'}
+                variant="link"
+                onClick={() => setVisibleDeleted(v => v + 4)}
+              >
+                Show More
+              </Button>
+            )}
           </Box>
         </Stack>
       </Flex>

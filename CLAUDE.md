@@ -8,26 +8,26 @@
 
 ## 📁 Description du projet
 
-**Nom du projet** : [NOM_DU_PROJET]
-**Description** : [Description courte de ce que fait ce projet en 1-2 phrases]
-**Type** : [API REST / Frontend React / CLI tool / Librairie NPM / Application fullstack / autre]
-**Statut** : [En développement actif / Maintenance / Stable / Déprécié]
-**Audience** : [Usage interne / Open source / Clients / etc.]
+**Nom du projet** : To-Do List
+**Description** : Application web de gestion de tâches permettant d'ajouter, compléter et supprimer des tâches, avec suivi en temps réel des tâches actives, terminées et supprimées. Interface responsive avec mode sombre/clair.
+**Type** : Frontend React
+**Statut** : En développement actif
+**Audience** : Open source
 
 ---
 
 ## 🛠️ Stack technique
 
-**Runtime** : Node.js [VERSION]
-**Package manager** : [npm / yarn / pnpm]
-**Framework principal** : [Express / Fastify / Next.js / NestJS / Koa / aucun]
-**Base de données** : [PostgreSQL / MySQL / MongoDB / Redis / SQLite / aucune]
-**ORM / Query builder** : [Prisma / Sequelize / TypeORM / Knex / aucun]
-**Tests** : [Jest / Vitest / Mocha / aucun]
-**Linter** : [ESLint / Biome / Standard]
-**Formatter** : [Prettier / Biome]
-**TypeScript** : [Oui / Non]
-**Bundler** : [Webpack / Vite / esbuild / aucun]
+**Runtime** : Node.js 18+
+**Package manager** : npm
+**Framework principal** : Create React App (react-scripts 5)
+**Base de données** : aucune (état local React)
+**ORM / Query builder** : aucun
+**Tests** : Jest + React Testing Library
+**Linter** : ESLint (config react-app)
+**Formatter** : Prettier
+**TypeScript** : Non
+**Bundler** : Webpack (via react-scripts)
 
 ---
 
